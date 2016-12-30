@@ -273,81 +273,57 @@ public class MapMainView extends SurfaceView implements Callback
                         savedMatrix.set(matrix);
                         disY = CommonMathHelper.getDistanceBetweenTwoPoints(lastX, lastY, event.getX(0), event.getY(0));
                         disZ = CommonMathHelper.getDistanceBetweenTwoPoints(mid.x, mid.y, event.getX(0), event.getY(0));
-                        if (justRotateGesture())
-                        {
-                            firstDegrees = rotation(event);
-                            this.mTouchState = TOUCH_STATE_ROTATE;
-                        }
-                        else
-                        {
-                            firstDistance = spaceBetweenTwoEvents(event);
-                            this.mTouchState = TOUCH_STATE_SCALING;
-                        }
+                        firstDegrees = rotation(event);
+                        this.mTouchState = TOUCH_STATE_ROTATE;
+                        firstDistance = spaceBetweenTwoEvents(event);
+                        this.mTouchState = TOUCH_STATE_SCALING;
                     }
                 }
-                else if (this.mTouchState == TOUCH_STATE_SCALING)
-                {
-                    if (this.isZoomGestureEnabled)
-                    {
-                        matrix.set(savedMatrix);
-                        if (isZoomWithTouchEventCenter)
-                        {
-                            midPoint(mid, event);
-                        }
-                        else
-                        {
-                            mid.x = this.getWidth() / 2;
-                            mid.y = this.getHeight() / 2;
-                        }
-                        float sencondDistance = spaceBetweenTwoEvents(event);
-                        float scale = sencondDistance / firstDistance;
-                        float ratio = this.zoom * scale;
-                        if (ratio < minZoomValue)
-                        {
-                            ratio = minZoomValue;
-                            scale = ratio / this.zoom;
-                        }
-                        else if (ratio > maxZoomValue)
-                        {
-                            ratio = maxZoomValue;
-                            scale = ratio / this.zoom;
-                        }
-                        this.currentZoom = ratio;
-                        this.matrix.postScale(scale, scale, mid.x, mid.y);
-                        this.refresh();
-                    }
-                }
-                else if (this.mTouchState == TOUCH_STATE_ROTATE)
-                {
-                    if (this.isRotationGestureEnabled)
-                    {
-                        matrix.set(savedMatrix);
-                        if (isRotateWithTouchEventCenter)
-                        {
-                            midPoint(mid, event);
-                        }
-                        else
-                        {
-                            mid.x = this.getWidth() / 2;
-                            mid.y = this.getHeight() / 2;
-                        }
-                        float deltaDegrees = rotation(event) - firstDegrees;
-                        float tempD = (this.rotateDegrees + deltaDegrees) % 360;
-                        this.currentRotateDegrees = tempD > 0 ? tempD : 360 + tempD;
-                        this.matrix.postRotate(deltaDegrees, mid.x, mid.y);
-                        this.refresh();
-                    }
-                }
-                else if (this.mTouchState == TOUCH_STATE_SCROLLING)
-                {
-                    if (this.isScrollGestureEnabled)
-                    {
-                        matrix.set(savedMatrix);
-                        matrix.postTranslate(event.getX() - start.x, event.getY() - start.y);
-                        this.refresh();
-                    }
-                }
-                break;
+                else else if (this.mTouchState == TOUCH_STATE_SCALING
+					|| this.mTouchState == TOUCH_STATE_ROTATE) {
+				matrix.set(savedMatrix);
+				if (this.isZoomGestureEnabled) {
+					if (isZoomWithTouchEventCenter) {
+						midPoint(mid, event);
+					} else {
+						mid.x = this.getWidth() / 2;
+						mid.y = this.getHeight() / 2;
+					}
+					float sencondDistance = spaceBetweenTwoEvents(event);
+					float scale = sencondDistance / firstDistance;
+					float ratio = this.zoom * scale;
+					if (ratio < minZoomValue) {
+						ratio = minZoomValue;
+						scale = ratio / this.zoom;
+					} else if (ratio > maxZoomValue) {
+						ratio = maxZoomValue;
+						scale = ratio / this.zoom;
+					}
+					this.currentZoom = ratio;
+					this.matrix.postScale(scale, scale, mid.x, mid.y);
+				}
+				if (this.isRotationGestureEnabled) {
+					if (isRotateWithTouchEventCenter) {
+						midPoint(mid, event);
+					} else {
+						mid.x = this.getWidth() / 2;
+						mid.y = this.getHeight() / 2;
+					}
+					float deltaDegrees = rotation(event) - firstDegrees;
+					float tempD = (this.rotateDegrees + deltaDegrees) % 360;
+					this.currentRotateDegrees = tempD > 0 ? tempD : 360 + tempD;
+					this.matrix.postRotate(deltaDegrees, mid.x, mid.y);
+				}
+				this.refresh();
+			} else if (this.mTouchState == TOUCH_STATE_SCROLLING) {
+				if (this.isScrollGestureEnabled) {
+					matrix.set(savedMatrix);
+					matrix.postTranslate(event.getX() - start.x, event.getY()
+							- start.y);
+					this.refresh();
+				}
+			}
+			break;
         }
         return true;
     }
